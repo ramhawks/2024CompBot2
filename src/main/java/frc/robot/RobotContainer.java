@@ -39,6 +39,7 @@ import frc.robot.commands.DepositAmpCommand;
 import frc.robot.commands.HomeFeederCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.IntakePositionCommand;
+import frc.robot.commands.ShootPositionCommand;
 import frc.robot.commands.ShootSpeakerCommand;
 import frc.robot.commands.StopIntakeCommand;
 import frc.robot.commands.SwerveFlightStick;
@@ -102,12 +103,14 @@ public class RobotContainer {
   private void configureBindings() {
           
         new JoystickButton(flightStick, 11).onTrue(new StopIntakeCommand(feeder, lights));
-        new JoystickButton(flightStick, 12).onTrue(new ShootSpeakerCommand(feeder, lights));
+        new JoystickButton(flightStick, 10).onTrue(new ShootSpeakerCommand(feeder, lights));
         new JoystickButton(flightStick, 6).onTrue(new IntakeCommand(feeder, lights));//.withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
         new JoystickButton(flightStick, 5).onTrue(new DepositAmpCommand(feeder, lights));
         new JoystickButton(flightStick, 8).onTrue(new HomeFeederCommand(feeder, lights));
         new JoystickButton(flightStick, 3).onTrue(new AmpPositionCommand(feeder));
         new JoystickButton(flightStick, 4).onTrue(new IntakePositionCommand(feeder));
+        
+        new JoystickButton(flightStick, 12).onTrue(new ShootPositionCommand(feeder));
   }
 
   private static double mapDouble(double valueIn, double baseMin, double baseMax, double limitMin, double limitMax) {
