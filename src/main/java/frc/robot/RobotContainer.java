@@ -6,6 +6,13 @@ package frc.robot;
 
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -37,8 +44,10 @@ import frc.robot.commands.StopIntakeCommand;
 import frc.robot.commands.SwerveFlightStick;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.commands.feederManual;
+import frc.robot.commands.simpleAutoShootAndDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.feederSubsystem;
+import frc.robot.subsystems.lightingSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,6 +64,8 @@ public class RobotContainer {
   public final static XboxController operatorController = new XboxController(USB.OPERATOR_CONTROLLER);
 
   public final static Joystick flightStick = new Joystick(USB.FLIGHTSTICK);
+
+  public final static lightingSubsystem lights = new lightingSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -74,6 +85,7 @@ public class RobotContainer {
                 mapDouble(flightStick.getRawAxis(OIConstants.kDriveThrottle), 1, -1, .25, 1), 
      () -> !flightStick.getRawButtonPressed(OIConstants.fieldOrientedButton))); 
 
+        //lights.rgBlink(255, 0, 0, 1);
 
      //feeder.setDefaultCommand(new feederManual(feeder, () -> operatorController.getRawAxis(1)));
 
@@ -89,11 +101,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
           
-        new JoystickButton(flightStick, 11).onTrue(new StopIntakeCommand(feeder));
-        new JoystickButton(flightStick, 12).onTrue(new ShootSpeakerCommand(feeder));
-        new JoystickButton(flightStick, 6).onTrue(new IntakeCommand(feeder));//.withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
-        new JoystickButton(flightStick, 5).onTrue(new DepositAmpCommand(feeder));
-        new JoystickButton(flightStick, 8).onTrue(new HomeFeederCommand(feeder));
+        new JoystickButton(flightStick, 11).onTrue(new StopIntakeCommand(feeder, lights));
+        new JoystickButton(flightStick, 12).onTrue(new ShootSpeakerCommand(feeder, lights));
+        new JoystickButton(flightStick, 6).onTrue(new IntakeCommand(feeder, lights));//.withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+        new JoystickButton(flightStick, 5).onTrue(new DepositAmpCommand(feeder, lights));
+        new JoystickButton(flightStick, 8).onTrue(new HomeFeederCommand(feeder, lights));
         new JoystickButton(flightStick, 3).onTrue(new AmpPositionCommand(feeder));
         new JoystickButton(flightStick, 4).onTrue(new IntakePositionCommand(feeder));
   }
@@ -108,7 +120,22 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-        // 1. Create trajectory settings
+
+              // Load the path you want to follow using its name in the GUI
+             // PathPlannerPath path = PathPlannerPath.fromPathFile("Straight Test Path");
+
+              // Create a path following command using AutoBuilder. This will also trigger event markers.
+              //return AutoBuilder.followPath(path);
+          
+         //return new PathPlannerAuto("Example Auto");
+
+         return new simpleAutoShootAndDrive(swerveSubsystem, feeder);
+  
+        }
+
+}
+
+       /*  // 1. Create trajectory settings
         TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -146,5 +173,4 @@ public class RobotContainer {
           new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
           swerveControllerCommand,
           new InstantCommand(() -> swerveSubsystem.stopModules()));
-    }
-}
+    } */

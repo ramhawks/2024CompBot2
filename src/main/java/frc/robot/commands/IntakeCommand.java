@@ -8,17 +8,20 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.feederSubsystem;
+import frc.robot.subsystems.lightingSubsystem;
 
 public class IntakeCommand extends Command {
   private final feederSubsystem feeder;
-  private boolean stopButton;
+  private final lightingSubsystem lighting;
 
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(feederSubsystem feeder) {
+  public IntakeCommand(feederSubsystem feeder, lightingSubsystem lighting) {
     this.feeder = feeder;
+    this.lighting = lighting;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(feeder);
+    addRequirements(lighting);
   }
 
   // Called when the command is initially scheduled.
@@ -32,6 +35,9 @@ public class IntakeCommand extends Command {
   @Override
   public void execute() {
     feeder.intake();
+    if(feeder.getIntakeSwitch()) {
+      lighting.setRGB(250, 91, 52);
+    }else lighting.setRGB(155, 66, 245);
   }
 
   // Called once the command ends or is interrupted.

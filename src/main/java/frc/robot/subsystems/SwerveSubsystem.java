@@ -1,20 +1,33 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain.SimSwerveModule;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Sensors;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class SwerveSubsystem extends SubsystemBase {
+
+
     private final SwerveModule frontLeft = new SwerveModule(
         DriveConstants.kFrontLeftDriveMotorPort, 
         DriveConstants.kFrontLeftTurningMotorPort, 
@@ -63,6 +76,33 @@ public class SwerveSubsystem extends SubsystemBase {
         }, new Pose2d(5.0, 13.5, new Rotation2d()));
 
     public SwerveSubsystem() {
+           // Configure AutoBuilder last
+   /*  AutoBuilder.configureHolonomic(
+        this::getPose, // Robot pose supplier
+        this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+        this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                4.5, // Max module speed, in m/s
+                0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                new ReplanningConfig() // Default path replanning config. See the API for the options here
+        ),
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this // Reference to this subsystem to set requirements
+); */
+        
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -75,6 +115,21 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         }).start();
     }
+
+     /*  public ChassisSpeeds getSpeeds() {
+    return kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+    public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
+        driveRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, getPose().getRotation()));
+     }
+
+  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+
+    SwerveModuleState[] targetStates = kinematics.toSwerveModuleStates(targetSpeeds);
+    setModuleStates(targetStates);
+  } */
 
     public void resetTurn(){
         frontLeft.resetTurn();
@@ -120,12 +175,12 @@ public class SwerveSubsystem extends SubsystemBase {
             backRight.getPosition()
         });
 
-        SmartDashboard.putNumber("Robot Heading", getHeading());;
+       /*  SmartDashboard.putNumber("Robot Heading", getHeading());;
         SmartDashboard.putNumber("Front Left Turn Angle", frontLeft.getAbsoluteEncoderRad());
         SmartDashboard.putNumber("Back Left Turn Angle", backLeft.getAbsoluteEncoderRad());
         SmartDashboard.putNumber("Front Right Turn Angle", frontRight.getAbsoluteEncoderRad());
         SmartDashboard.putNumber("Back Right Turn Angle", backRight.getAbsoluteEncoderRad());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString()); */
 
         
         if (RobotContainer.driverController.getBButton()){
@@ -148,6 +203,13 @@ public class SwerveSubsystem extends SubsystemBase {
         backLeft.setDesiredState(desiredStates[2]);
         backRight.setDesiredState(desiredStates[3]);
     }
-
-
+     /*public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] states = new SwerveModuleState[modules.length];
+        for (int i = 0; i < modules.length; i++) {
+            states[i] = modules[i].getState();
+        }
+        return states; */
 }
+
+
+

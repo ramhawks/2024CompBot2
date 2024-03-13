@@ -8,17 +8,21 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.feederSubsystem;
+import frc.robot.subsystems.lightingSubsystem;
 
 
 
 public class DepositAmpCommand extends Command {
   private final feederSubsystem feeder;
+  private final lightingSubsystem lighting;
 
   /** Creates a new DepositAmpCommand. */
-  public DepositAmpCommand(feederSubsystem feeder) {
+  public DepositAmpCommand(feederSubsystem feeder, lightingSubsystem lighting) {
     this.feeder = feeder;
+    this.lighting = lighting;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(feeder);
+    addRequirements(lighting);
   
   }
 
@@ -32,6 +36,7 @@ public class DepositAmpCommand extends Command {
   @Override
   public void execute() {
     feeder.depositAmp();
+    lighting.setRGB(66,173,245);
   }
 
   // Called once the command ends or is interrupted.

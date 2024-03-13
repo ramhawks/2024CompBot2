@@ -4,24 +4,35 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.proto.System;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 
 public class lightingSubsystem extends SubsystemBase {
   /** Creates a new lightingSubsystem. */
     private static AddressableLED led_strip;
     private static AddressableLEDBuffer led_buffer;
+    private int red = 0;
+    private int green = 0;
+    private int blue = 0;
+    private int time = 0;
+    private boolean blink = false;
+    private boolean blinkOn = false;
+    private double currentTime;
+    
+    
+
 
   public lightingSubsystem() {
     led_strip = new AddressableLED(0);
 
-    led_buffer = new AddressableLEDBuffer(60);
+    led_buffer = new AddressableLEDBuffer(30);
 
     led_strip.setLength(led_buffer.getLength());
 
-
+    rgBlink(255, 0, 0, 1);
   }
 
   public void setRed(int value){
@@ -77,6 +88,20 @@ public class lightingSubsystem extends SubsystemBase {
     led_strip.setData(led_buffer);
     led_strip.start();
   }
+  public void rgBlink(int red, int green, int blue, int time){
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+    this.time = time;
+    blink = true;
+
+    setRGB(red, green, blue);
+
+    blinkOn = true;
+
+    currentTime = Timer.getFPGATimestamp();
+
+  }
 
   // public static void setBlue(double setPoint){
   //   if(setPoint < 0) setPoint = 0;
@@ -86,6 +111,16 @@ public class lightingSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
+      if (blink){
+        if(blinkOn && currentTime > 1){
+          setRGB(0, 0, 0);
+          blinkOn = false;
+          currentTime = Timer.getFPGATimestamp();
+        }else if (!blinkOn && currentTime > 1) {
+          setRGB(red, green, blue);
+          blinkOn = true;
+          currentTime = Timer.getFPGATimestamp();
+        }
+      }
   }
 }

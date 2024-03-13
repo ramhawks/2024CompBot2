@@ -129,7 +129,7 @@ public class feederSubsystem extends SubsystemBase {
     positionMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
     positionMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
 
-    positionMotor.set(.25);
+    positionMotor.set(.5);
     while(!positionLimitSwitch.isPressed());
     positionMotor.set(0);
     positionEncoder.setPosition(0);
@@ -146,7 +146,7 @@ public class feederSubsystem extends SubsystemBase {
   public void intakePosition(){
     if(!isHomed) return;
     //gets the feeder into position for the intake to take in the "notes"
-    positionMotorPID.setReference(-170, CANSparkMax.ControlType.kPosition);
+    positionMotorPID.setReference(-180, CANSparkMax.ControlType.kPosition);
     //while(Math.abs(positionEncoder.getPosition() + -170) > 5);
   }
 
@@ -171,12 +171,19 @@ public class feederSubsystem extends SubsystemBase {
 
     //dropServo01.set(0);
     //dropServo02.set(180);
-     
-    outerMotorPID.setReference(Feeder.intakeSpeedOuter,  CANSparkMax.ControlType.kVelocity);
-    innerMotorPID.setReference(Feeder.intakeSpeedInner, CANSparkMax.ControlType.kVelocity);
+    if(!intakeSwitch.get()) {
+      stopMotors(); 
+    }
+    else{
+      outerMotorPID.setReference(Feeder.intakeSpeedOuter,  CANSparkMax.ControlType.kVelocity);
+      innerMotorPID.setReference(Feeder.intakeSpeedInner, CANSparkMax.ControlType.kVelocity);
+    }
 
-    if(!intakeSwitch.get()) stopMotors();
+  }
 
+  public void shootPosition(){
+    if(!isHomed) return;
+    positionMotorPID.setReference(-110, CANSparkMax.ControlType.kPosition);
   }
 
   public void stopMotors(){
@@ -185,11 +192,13 @@ public class feederSubsystem extends SubsystemBase {
 
     outerMotor.set(0);
     innerMotor.set(0);
+    outerMotor.setIdleMode(IdleMode.kBrake);
+    innerMotor.setIdleMode(IdleMode.kBrake);
     
     //dropServo01.set(0);
     //dropServo02.set(180);
 
-   // innerMotorPID.setReference(innerMotorEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
+    innerMotorPID.setReference(innerMotorEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
    // outerMotorPID.setReference(outerMotorEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
   }
 
@@ -233,8 +242,14 @@ public class feederSubsystem extends SubsystemBase {
         positionMotorPID.setReference(-200, CANSparkMax.ControlType.kPosition);
         while(Math.abs(positionEncoder.getPosition() + 200) > 5);
     }
+  }
 
-    
+  public boolean isHomed(){
+    return isHomed;
+  }
+
+  public boolean getIntakeSwitch(){
+    return intakeSwitch.get();
   }
 
 }
